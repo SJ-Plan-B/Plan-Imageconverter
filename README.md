@@ -1,7 +1,7 @@
 # Plan-ImageConverter
 Plan-ImageConverter is a basic python base image converter
 
-## dependencies#
+## dependencies
 install the following dependencies
 ```
 pip install pillow
