@@ -1,7 +1,7 @@
 # Plan-Convert
 
 ## dependencies#
-install the following dependencys
+install the following dependencies
 ```
 pip install pillow
 ```
