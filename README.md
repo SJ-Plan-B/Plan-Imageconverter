@@ -20,7 +20,7 @@ pip install pillow
 .h5, .gbr, .jpg, .pcd, .ppm, .fli, .emf, .eps, .mpeg, .dds,
 .ps, .jpc, .pgm, .tga, .jfif, .wmf, .grib, .pbm, .mpg, .msp,
 .dcx, .dib, .tif, .flc, .fits, .rgba, .pcx, .rgb, .xbm, .fit,
-.jp2, .jpeg, .webp, .qoi, .sgi, .bufr)
+.jp2, .jpeg, .webp, .qoi, .sgi, .bufr
 
 ### Author
 Sidney Schmidt
