@@ -22,5 +22,5 @@ pip install pillow
 .dcx, .dib, .tif, .flc, .fits, .rgba, .pcx, .rgb, .xbm, .fit,
 .jp2, .jpeg, .webp, .qoi, .sgi, .bufr)
 
-### Coded by
+### Author
 Sidney Schmidt
