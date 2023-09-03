@@ -1,8 +1,8 @@
 # Plan-ImageConverter
-Plan-ImageConverter is a basic python base image converter
+Plan-ImageConverter is a simple python based mass image conversion tool.
 
 ## dependencies
-install the following dependencies
+You must install the following dependencies
 ```
 pip3 install pillow
 pip3 install PySimpleGUI
@@ -10,9 +10,9 @@ pip3 install PySimpleGUI
 
 ## Usage
 - Run main.py
-- select source folder
-- select output
-- enter size if you want to resize
+- select a source folder
+- select an output folder
+- enter a size if you want to resize
 - select target format
 - press 'Ok'
 
