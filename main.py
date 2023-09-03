@@ -6,7 +6,7 @@ from os.path import isfile, join
 import PySimpleGUI as sg
 
 
-def main(target_data_type, source_folder, target_folder):
+def main(target_data_type, source_folder, target_folder, verticalsize, horizontalsize):
     target_data_type = target_data_type
     source_directory = source_folder
     # source_directory = os.path.abspath(source_directory)
@@ -19,9 +19,11 @@ def main(target_data_type, source_folder, target_folder):
         print(file)
         if file.endswith(data_type):
             image = Image.open(source_directory + "\\" + file)
-            print(image)
+
+            if verticalsize != 0 and horizontalsize != 0:
+                size = (int(verticalsize), int(horizontalsize))
+                image = image.resize(size)
             image = image.convert('RGB')
-            print(target_folder + Path(file).stem + target_data_type)
             image.save(target_folder + "\\" + Path(file).stem + target_data_type)
             print("Image successfully converted!")
 
@@ -44,8 +46,8 @@ if __name__ == "__main__":
         [sg.Text('Image Converter')],
         [sg.Text('source folder'), sg.In(size=(25, 1), enable_events=True, key='-InputFOLDER-'), sg.FolderBrowse()],
         [sg.Text('output folder'), sg.In(size=(25, 1), enable_events=True, key='-OutputFOLDER-'), sg.FolderBrowse()],
-        [sg.Text('target format'),
-         sg.Combo( data_type, size=(30, 6), )],
+        [sg.Text('Resize\nLeave empty to not resize\n'), sg.In(size=(20, 1), key='-verticalsize-'), sg.Text('x'), sg.InputText(size=(20, 1),key='-horizontalsize-')],
+        [sg.Text('target format'), sg.Combo( data_type, size=(30, 6), key='-targetformat-',)],
         [sg.Button('Ok'), sg.Button('Cancel')]
     ]
 
@@ -62,8 +64,13 @@ if __name__ == "__main__":
             target_folder = values['-OutputFOLDER-']
         if event == 'Ok':
             if locals() and 'source_folder' in locals() and 'target_folder' in locals():
-                if values[0]:
-                    main(values[0], source_folder, target_folder)
+                if values['-targetformat-']:
+                    if values['-verticalsize-'] and values['-horizontalsize-']:
+                        main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'])
+                    else:
+                        main(values['-targetformat-'], source_folder, target_folder, 0, 0)
+
+        print(values)
 
 
     window.close()
