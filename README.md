@@ -4,7 +4,8 @@ Plan-ImageConverter is a basic python base image converter
 ## dependencies
 install the following dependencies
 ```
-pip install pillow
+pip3 install pillow
+pip3 install PySimpleGUI
 ```
 
 ## Usage
