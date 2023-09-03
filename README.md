@@ -10,9 +10,11 @@ pip3 install PySimpleGUI
 
 ## Usage
 - Run main.py
-- Enter the format you want your images to be convertet to
-- Enter the directory of the images (default folder: .\input).
-- Enter the directory to which you want the images to be stored (default folder: .\output).
+- select source folder
+- select output
+- enter size if you want to resize
+- select target format
+- press 'Ok'
 
 ## Supportet formats
 .ftc, .bw, .cur, .icns, .xpm, .j2c, .jpx, .icb, .ftu,
