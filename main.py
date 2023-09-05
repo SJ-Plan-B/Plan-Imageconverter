@@ -9,7 +9,7 @@ import PySimpleGUI as sg
 def main(target_data_type, source_folder, target_folder, verticalsize, horizontalsize, deleteoriginal):
     target_data_type = target_data_type
     source_directory = source_folder
-    # source_directory = os.path.abspath(source_directory)
+    source_directory = os.path.abspath(source_directory)
     target_directory = target_folder
     target_directory = os.path.abspath(target_directory)
 
