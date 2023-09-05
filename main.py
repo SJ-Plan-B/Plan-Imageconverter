@@ -13,20 +13,20 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
     target_directory = target_folder
     target_directory = os.path.abspath(target_directory)
 
-    files = [f for f in listdir(source_directory) if isfile(join(source_directory, f))]
+    files = [f for f in listdir(source_directory) if isfile(join(source_directory, f)) and f.endswith(data_type)]
 
     for file in files:
         try:
-            print(file)
-            if file.endswith(data_type):
-                image = Image.open(source_directory + "\\" + file)
+            print('Converting '+file+' ...')
 
-                if verticalsize != 0 and horizontalsize != 0:
-                    size = (int(verticalsize), int(horizontalsize))
-                    image = image.resize(size)
-                image = image.convert('RGB')
-                image.save(target_folder + "\\" + Path(file).stem + target_data_type)
-                print("Image successfully converted!")
+            image = Image.open(source_directory + "\\" + file)
+
+            if verticalsize != 0 and horizontalsize != 0:
+                size = (int(verticalsize), int(horizontalsize))
+                image = image.resize(size)
+            image = image.convert('RGB')
+            image.save(target_folder + "\\" + Path(file).stem + target_data_type)
+            print(file+" successfully converted!")
         except:
             print("An error occurred while converting "+ file)
             if deleteoriginal:
@@ -34,8 +34,7 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
                 exit(1)
     if deleteoriginal:
             for file in files:
-                if file.endswith(data_type):
-                    os.remove(source_folder+"\\"+file)
+                os.remove(source_folder+"\\"+file)
 
     exit(0)
 
@@ -79,8 +78,7 @@ if __name__ == "__main__":
                     if locals() and 'source_folder' in locals() and 'target_folder' in locals():
                         if values['-targetformat-']:
                             if values['-verticalsize-'] and values['-horizontalsize-']:
-                                main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'],
-                                     values['-horizontalsize-'])
+                                main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], True)
                             else:
                                 main(values['-targetformat-'], source_folder, target_folder, 0, 0, True)
 
@@ -88,10 +86,10 @@ if __name__ == "__main__":
                 if locals() and 'source_folder' in locals() and 'target_folder' in locals():
                     if values['-targetformat-']:
                         if values['-verticalsize-'] and values['-horizontalsize-']:
-                            main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'],
-                                 values['-horizontalsize-'])
+                            main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], False)
                         else:
                             main(values['-targetformat-'], source_folder, target_folder, 0, 0, False)
+
 
 
 
