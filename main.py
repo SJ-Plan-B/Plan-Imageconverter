@@ -6,7 +6,7 @@ from os.path import isfile, join
 import PySimpleGUI as sg
 
 
-def main(target_data_type, source_folder, target_folder, verticalsize, horizontalsize, deleteoriginal):
+def main(target_data_type, source_folder, target_folder, verticalsize, horizontalsize, deleteoriginal, rgba):
     target_data_type = target_data_type
     source_directory = source_folder
     source_directory = os.path.abspath(source_directory)
@@ -24,17 +24,36 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
                 if verticalsize != 0 and horizontalsize != 0:
                     size = (int(verticalsize), int(horizontalsize))
                     image = image.resize(size)
-                image = image.convert('RGB')
+
+
+                if rgba:
+                    image = image.convert('RGBA')
+                    background = Image.new('RGBA', image.size, (255, 255, 255))
+                    image_rgb = Image.alpha_composite(background, image)
+                else:
+                    image_rgb = image.convert('RGB')
+
+
+
+
+
+
+                
                 newfile = Path(file).stem + target_data_type
                 if child == source_directory:
-                    image.save(join(target_directory, newfile))
+                    image_rgb.save(join(target_directory, newfile))
                 target =os.path.join(target_directory,child.relative_to(source_directory))
+
+                # creat sub dir if not existing like in source to maintain original dir structure
                 if not os.path.exists(target):
                     os.makedirs(target)
-                image.save(os.path.join(target,newfile))
+
+                image_rgb.save(os.path.join(target,newfile))
+
                 print(file+" successfully converted!")
-            except:
+            except Exception as exception:
                 print("An error occurred while converting "+ file)
+                print(exception)
                 if deleteoriginal:
                     return False
         if deleteoriginal:
@@ -44,20 +63,23 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
                     except:
                         print("An error occurred while deleting "+ file)
                         return False
-        return True
+    return True
 
 
 
 
 if __name__ == "__main__":
-    data_type = ('.jpeg', '.jpg', '.webp', '.bmp', '.gif', '.tiff', '.png',
-                 '.ftc', '.bw', '.cur', '.icns', '.xpm', '.j2c', '.jpx', '.icb', '.ftu',
-                 '.apng', '.vda', '.vst', '.jpe', '.pnm', '.ras', '.psd',
-                 '.iim', '.pxr', '.blp', '.j2k', '.jpf', '.im', '.hdf', '.ico',
-                 '.h5', '.gbr', '.pcd', '.ppm', '.fli', '.emf', '.eps', '.mpeg', '.dds',
-                 '.ps', '.jpc', '.pgm', '.tga', '.jfif', '.wmf', '.grib', '.pbm', '.mpg', '.msp',
-                 '.dcx', '.dib', '.tif', '.flc', '.fits', '.rgba', '.pcx', '.rgb', '.xbm', '.fit',
-                 '.jp2', '.qoi', '.sgi', '.bufr')
+    data_type = ('.apng', '.blp', '.bmp', '.bufr', '.bw', '.cur', '.dcx', '.dds', '.dib',
+               '.emf', '.eps', '.fit', '.fits', '.flc', '.fli', '.ftc', '.ftu', '.gbr',
+               '.gif', '.grib', '.h5', '.hdf', '.icb', '.icns', '.ico', '.iim', '.im',
+               '.j2c', '.j2k', '.jfif', '.jp2', '.jpc', '.jpe', '.jpeg', '.jpf', '.jpg',
+               '.jpx', '.mpeg', '.mpg', '.msp', '.pbm', '.pcd', '.pcx', '.pgm', '.png',
+               '.pnm', '.ppm', '.ps', '.psd', '.pxr', '.qoi', '.ras', '.rgb', '.rgba',
+               '.sgi', '.tga', '.tif', '.tiff', '.vda', '.vst', '.webp', '.wmf', '.xbm',
+               '.xpm')
+
+    resize_visible = False
+    rgba = False
 
     sg.theme('DarkAmber')  # Add a touch of color
     # All the stuff inside your window.
@@ -65,19 +87,30 @@ if __name__ == "__main__":
         [sg.Text('Image Converter')],
         [sg.Text('source folder'), sg.In(size=(25, 1), enable_events=True, key='-InputFOLDER-'), sg.FolderBrowse()],
         [sg.Text('output folder'), sg.In(size=(25, 1), enable_events=True, key='-OutputFOLDER-'), sg.FolderBrowse()],
-        [sg.Text('Resize\nLeave empty to not resize\n'), sg.In(size=(20, 1), key='-verticalsize-'), sg.Text('x'), sg.InputText(size=(20, 1),key='-horizontalsize-')],
+        [sg.Checkbox('resize Image', enable_events=True, key='-resize-', ), sg.Checkbox('RGBA', enable_events=True, key='-rgba-')],
+        [sg.Text('resize', key='resize text', visible=resize_visible), sg.In(size=(20, 1), key='-verticalsize-', visible=resize_visible), sg.Text('x', key='resize x', visible=resize_visible), sg.InputText(size=(20, 1),key='-horizontalsize-', visible=resize_visible)],
         [sg.Text('target format'), sg.Combo( data_type, size=(30, 6), key='-targetformat-',)],
-        [sg.Text('Delete Original'), sg.Combo(['Yes', 'No'], size=(30, 6), key='-deleteoriginal-', )],
+        [sg.Text('Delete Original'), sg.Combo(['Yes', 'No'], default_value='No', size=(30, 6), key='-deleteoriginal-', )],
         [sg.Button('Ok'), sg.Button('Exit')]
     ]
 
     # Create the Window
-    converter = sg.Window('Window Title', layout)
+    converter = sg.Window('Plan-Imageconverter', layout)
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
         event, values = converter.read()
         if event == sg.WIN_CLOSED or event == 'Exit':  # if user closes window or clicks cancel
             break
+        if event == '-resize-':
+            resize_visible = not resize_visible
+            converter['resize text'].update(visible=resize_visible)
+            converter['-verticalsize-'].update(visible=resize_visible)
+            converter['resize x'].update(visible=resize_visible)
+            converter['-horizontalsize-'].update(visible=resize_visible)
+            converter.refresh()
+            print(resize_visible)
+        if event == '-rgba-':
+            rgba = not rgba
         if event == '-InputFOLDER-':
             source_folder = values['-InputFOLDER-']
         if event == '-OutputFOLDER-':
@@ -93,7 +126,8 @@ if __name__ == "__main__":
             if values['-deleteoriginal-'] == 'No':
                 values['-deleteoriginal-'] = False
             if 'source_folder' in locals() and 'target_folder' in locals() and values['-targetformat-']:
-                if main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], values['-deleteoriginal-'] ):
+                if main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], values['-deleteoriginal-'], rgba):
                     sg.popup('Process finished successfully')
                 else:
                     sg.popup('An error occurred!\nProcess aborted')
+        print(values)
