@@ -10,33 +10,43 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
     target_data_type = target_data_type
     source_directory = source_folder
     source_directory = os.path.abspath(source_directory)
-    target_directory = target_folder
-    target_directory = os.path.abspath(target_directory)
+    target_directory = os.path.abspath(target_folder)
+    p = Path(source_directory)
+    for child in p.glob('**/'):
+        files = [f for f in listdir(child) if isfile(join(child, f)) and f.endswith(data_type)]
 
-    files = [f for f in listdir(source_directory) if isfile(join(source_directory, f)) and f.endswith(data_type)]
+        for file in files:
+            try:
+                print('Converting '+file+' ...')
 
-    for file in files:
-        try:
-            print('Converting '+file+' ...')
+                image = Image.open(join(child, file))
 
-            image = Image.open(source_directory + "\\" + file)
+                if verticalsize != 0 and horizontalsize != 0:
+                    size = (int(verticalsize), int(horizontalsize))
+                    image = image.resize(size)
+                image = image.convert('RGB')
+                newfile = Path(file).stem + target_data_type
+                if child == source_directory:
+                    image.save(join(target_directory, newfile))
+                target =os.path.join(target_directory,child.relative_to(source_directory))
+                if not os.path.exists(target):
+                    os.makedirs(target)
+                image.save(os.path.join(target,newfile))
+                print(file+" successfully converted!")
+            except:
+                print("An error occurred while converting "+ file)
+                if deleteoriginal:
+                    return False
+        if deleteoriginal:
+                for file in files:
+                    try:
+                        os.remove(join(child, file))
+                    except:
+                        print("An error occurred while deleting "+ file)
+                        return False
+        return True
 
-            if verticalsize != 0 and horizontalsize != 0:
-                size = (int(verticalsize), int(horizontalsize))
-                image = image.resize(size)
-            image = image.convert('RGB')
-            image.save(target_folder + "\\" + Path(file).stem + target_data_type)
-            print(file+" successfully converted!")
-        except:
-            print("An error occurred while converting "+ file)
-            if deleteoriginal:
-                print("Aborting process...")
-                exit(1)
-    if deleteoriginal:
-            for file in files:
-                os.remove(source_folder+"\\"+file)
 
-    exit(0)
 
 
 if __name__ == "__main__":
@@ -58,7 +68,7 @@ if __name__ == "__main__":
         [sg.Text('Resize\nLeave empty to not resize\n'), sg.In(size=(20, 1), key='-verticalsize-'), sg.Text('x'), sg.InputText(size=(20, 1),key='-horizontalsize-')],
         [sg.Text('target format'), sg.Combo( data_type, size=(30, 6), key='-targetformat-',)],
         [sg.Text('Delete Original'), sg.Combo(['Yes', 'No'], size=(30, 6), key='-deleteoriginal-', )],
-        [sg.Button('Ok'), sg.Button('Cancel')]
+        [sg.Button('Ok'), sg.Button('Exit')]
     ]
 
     # Create the Window
@@ -66,34 +76,24 @@ if __name__ == "__main__":
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
         event, values = converter.read()
-        if event == sg.WIN_CLOSED or event == 'Cancel':  # if user closes window or clicks cancel
+        if event == sg.WIN_CLOSED or event == 'Exit':  # if user closes window or clicks cancel
             break
         if event == '-InputFOLDER-':
             source_folder = values['-InputFOLDER-']
         if event == '-OutputFOLDER-':
             target_folder = values['-OutputFOLDER-']
         if event == 'Ok':
+            if not (values['-verticalsize-'] and values['-horizontalsize-']):
+                values['-verticalsize-'] = values['-horizontalsize-'] = 0
             if values['-deleteoriginal-'] == 'Yes':
                 if sg.popup_yes_no('Are you sure to delete the original pictures?') == 'Yes':
-                    if locals() and 'source_folder' in locals() and 'target_folder' in locals():
-                        if values['-targetformat-']:
-                            if values['-verticalsize-'] and values['-horizontalsize-']:
-                                main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], True)
-                            else:
-                                main(values['-targetformat-'], source_folder, target_folder, 0, 0, True)
-
+                    values['-deleteoriginal-'] = True
+                else:
+                    values['-deleteoriginal-'] = False
             if values['-deleteoriginal-'] == 'No':
-                if locals() and 'source_folder' in locals() and 'target_folder' in locals():
-                    if values['-targetformat-']:
-                        if values['-verticalsize-'] and values['-horizontalsize-']:
-                            main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], False)
-                        else:
-                            main(values['-targetformat-'], source_folder, target_folder, 0, 0, False)
-
-
-
-
-        print(values)
-
-
-    converter.close()
+                values['-deleteoriginal-'] = False
+            if 'source_folder' in locals() and 'target_folder' in locals() and values['-targetformat-']:
+                if main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'], values['-horizontalsize-'], values['-deleteoriginal-'] ):
+                    sg.popup('Process finished successfully')
+                else:
+                    sg.popup('An error occurred!\nProcess aborted')
