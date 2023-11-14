@@ -1,0 +1,59 @@
+name: Package Application and Pusch to Release
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+
+  build:
+   
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python "3.11"
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: build exe
+      run: |
+        python -m PyInstaller --onefile main.py
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: windowsexe
+        path: dist/main.exe
+        if-no-files-found: error
+        retention-days: 1
+
+  deploy:
+
+    needs: build
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+
+    - uses: actions/checkout@v3
+    
+    - uses: actions/download-artifact@v3
+      with:
+        name: windowsexe
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: main.exe
+        asset_name: Plan-ImageConverter.exe
+        tag: Releases
+        overwrite: true
+        body: "Windows .exe File to run from a single file"
