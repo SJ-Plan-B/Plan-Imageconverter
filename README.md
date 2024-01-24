@@ -17,13 +17,14 @@ pip3 install PySimpleGUI
 - press 'Ok'
 
 ## Supportet formats
-.ftc, .bw, .cur, .icns, .xpm, .j2c, .jpx, .icb, .ftu,
-.apng, .vda, .tiff, .vst, .jpe, .pnm, .ras, .psd, .bmp,
-.gif, .iim, .pxr, .blp, .j2k, .jpf, .im, .hdf, .png, .ico,
-.h5, .gbr, .jpg, .pcd, .ppm, .fli, .emf, .eps, .mpeg, .dds,
-.ps, .jpc, .pgm, .tga, .jfif, .wmf, .grib, .pbm, .mpg, .msp,
-.dcx, .dib, .tif, .flc, .fits, .rgba, .pcx, .rgb, .xbm, .fit,
-.jp2, .jpeg, .webp, .qoi, .sgi, .bufr
+'.apng', '.avif', '.blp', '.bmp', '.bufr', '.bw', '.cur', '.dcx', '.dds',
+'.dib', '.emf', '.eps', '.fit', '.fits', '.flc', '.fli', '.ftc', '.ftu',
+'.gbr', '.grib', '.h5', '.hdf', '.icb', '.icns', '.ico', '.iim', '.im',
+'.j2c', '.j2k', '.jfif', '.jp2', '.jpc', '.jpe', '.jpeg', '.jpf', '.jpg',
+'.jpx', '.mpeg', '.mpg', '.msp', '.pbm', '.pcd', '.pcx', '.pgm', '.png',
+'.pnm', '.ppm', '.ps', '.psd', '.pxr', '.qoi', '.ras', '.rgb', '.rgba',
+'.sgi', '.tga', '.tif', '.tiff', '.vda', '.vst', '.webp', '.wmf', '.xbm',
+'.xpm'
 
 ### Author
 Sidney Schmidt

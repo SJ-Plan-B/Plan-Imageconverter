@@ -4,21 +4,25 @@ from PIL import Image
 from os import listdir
 from os.path import isfile, join
 import PySimpleGUI as sg
+import pillow_avif
+import logging
+from datetime import datetime
 
 
 def main(target_data_type, source_folder, target_folder, verticalsize, horizontalsize, deleteoriginal, rgba):
     # vars
+    success = True
     source_directory = os.path.abspath(source_folder)
     target_directory = os.path.abspath(target_folder)
 
     # get files according to recognized formats
     p = Path(source_directory)
     for child in p.glob('**/'):
-        files = [f for f in listdir(child) if isfile(join(child, f)) and f.endswith(data_type)]
+        files = [f for f in listdir(child) if isfile(join(child, f)) and (f.endswith(data_type) and not f.endswith(target_data_type))]
 
         for file in files:
             try:
-                print('Converting ' + file + ' ...')
+                print('Converting ' + join(child,file) + ' ...')
 
                 image = Image.open(join(child, file))
 
@@ -38,7 +42,7 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
                     image_rgb.save(join(target_directory, newfile))
                 target = os.path.join(target_directory, child.relative_to(source_directory))
 
-                # creat sub dir if not existing like in source to maintain original dir structure
+                # create sub dir if not existing like in source to maintain original dir structure
                 if not os.path.exists(target):
                     os.makedirs(target)
 
@@ -46,25 +50,45 @@ def main(target_data_type, source_folder, target_folder, verticalsize, horizonta
 
                 print(file + " successfully converted!")
             except Exception as exception:
-                print("An error occurred while converting " + file)
+                print("An error occurred while converting " + join(child,file))
+                logging.warning('An error occurred while converting ' + join(child,file))
                 print(exception)
+                success = False
+                # remove file from list to prevent deletion
                 if deleteoriginal:
-                    return False
+                    try:
+                        files.remove(file)
+                    except Exception as exception:
+                        print("An error occurred while removing file from list to prevent deletion " + join(child,file) + "Process aborted")
+                        logging.warning('An error occurred while removing file from list to prevent deletion ' + join(child,file) + "Process aborted")
+                        return False
+
+
         if deleteoriginal:
             for file in files:
                 try:
                     os.remove(join(child, file))
                 except Exception as exception:
-                    print("An error occurred while deleting " + file)
+                    print("An error occurred while deleting " + join(child,file))
+                    logging.warning("An error occurred while deleting " + join(child,file))
                     print(exception)
-                    return False
-    return True
+                    success = False
+    return success
 
 
 if __name__ == "__main__":
-    data_type = ('.apng', '.blp', '.bmp', '.bufr', '.bw', '.cur', '.dcx', '.dds', '.dib',
-                 '.emf', '.eps', '.fit', '.fits', '.flc', '.fli', '.ftc', '.ftu', '.gbr',
-                 '.gif', '.grib', '.h5', '.hdf', '.icb', '.icns', '.ico', '.iim', '.im',
+    logging_foler = "logs"
+    if not os.path.exists(logging_foler):
+        os.makedirs(logging_foler)
+    logging.basicConfig(filename=join(logging_foler, datetime.today().strftime('%Y-%m-%d_%H-%M-%S.log')),
+                        filemode='a',
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.INFO)
+    logging.info('Process start')
+    data_type = ('.apng', '.avif', '.blp', '.bmp', '.bufr', '.bw', '.cur', '.dcx', '.dds',
+                 '.dib', '.emf', '.eps', '.fit', '.fits', '.flc', '.fli', '.ftc', '.ftu',
+                 '.gbr', '.grib', '.h5', '.hdf', '.icb', '.icns', '.ico', '.iim', '.im',
                  '.j2c', '.j2k', '.jfif', '.jp2', '.jpc', '.jpe', '.jpeg', '.jpf', '.jpg',
                  '.jpx', '.mpeg', '.mpg', '.msp', '.pbm', '.pcd', '.pcx', '.pgm', '.png',
                  '.pnm', '.ppm', '.ps', '.psd', '.pxr', '.qoi', '.ras', '.rgb', '.rgba',
@@ -134,6 +158,8 @@ if __name__ == "__main__":
                 if main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'],
                         values['-horizontalsize-'], values['-deleteoriginal-'], rgba):
 
+                    logging.info('Process finished successfully')
                     sg.popup('Process finished successfully')
                 else:
-                    sg.popup('An error occurred!\nProcess aborted')
+                    logging.info('The Process Finished Unsuccessfully')
+                    sg.popup('An error occurred!\nPlease see Plan-Imageconverter/logs')
