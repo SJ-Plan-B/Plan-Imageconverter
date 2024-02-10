@@ -41,6 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+  
+    - uses: dev-drprasad/delete-tag-and-release@v0.2.1
+      with:
+        tag_name: Releases
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        delete_release: true
 
     - uses: actions/checkout@v3
     
