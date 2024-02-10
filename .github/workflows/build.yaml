@@ -40,7 +40,7 @@ jobs:
 
   build4arch:
   
-      runs-on: arch-latest
+      runs-on: ubuntu-latest
   
       steps:
       - uses: actions/checkout@v3
@@ -65,7 +65,7 @@ jobs:
           name: Plan-Imageconverter.pkg.tar.zst  # Adjust package name as needed
           path: '*.pkg.tar.zst'
 
-
+  
   publish:
 
     needs: [build4win, build4arch]
