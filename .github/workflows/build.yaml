@@ -1,4 +1,4 @@
-name: Package Application and Pusch to Release
+name: Build for Windows
 
 on:
   push:
@@ -45,9 +45,10 @@ jobs:
     - uses: dev-drprasad/delete-tag-and-release@v0.2.1
       with:
         tag_name: Releases
-        github_token: ${{ secrets.TOKEN }}
         delete_release: true
-
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
     - uses: actions/checkout@v3
     
     - uses: actions/download-artifact@v3
@@ -57,7 +58,7 @@ jobs:
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: main.exe
         asset_name: Plan-ImageConverter.exe
         tag: Releases
