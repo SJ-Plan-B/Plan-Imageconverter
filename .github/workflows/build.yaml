@@ -47,8 +47,9 @@ jobs:
   
       - name: Install dependencies
         run: |
-          sudo pacman -Sy --noconfirm base-devel
-          sudo pacman -Sy --noconfirm python
+           sudo apt update
+           sudo apt install --no-install-recommends -y base-devel python python-pip
+
   
       - name: Install Python dependencies
         run: |
