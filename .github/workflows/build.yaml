@@ -38,64 +38,9 @@ jobs:
         retention-days: 1
 
 
-  builddeb:
-  
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y dpkg-dev
-
-    - name: Create package directory
-      run: |
-        mkdir -p package_dir/DEBIAN
-        mkdir -p package_dir/usr/bin 
-
-    - name: Copy Python script to package directory
-      run: |
-        cp main.py package_dir/usr/bin
-
-    - name: Install Python dependencies
-      run: |
-        pip3 install --upgrade pip
-        pip3 install -r requirements.txt --target=package_dir/usr/lib/python3/dist-packages
-
-    - name: Create control file
-      run: |
-        echo "Package: your-package-name" > package_dir/DEBIAN/control
-        echo "Version: 1.0.0" >> package_dir/DEBIAN/control  # Adjust version as needed
-        echo "Architecture: all" >> package_dir/DEBIAN/control
-        echo "Maintainer: Your Name <your.email@example.com>" >> package_dir/DEBIAN/control
-        echo "Description: Your package description" >> package_dir/DEBIAN/control
-        echo "Depends: python3" >> package_dir/DEBIAN/control  # Add Python dependency
-
-    - name: Set permissions
-      run: |
-        chmod -R 755 package_dir
-
-    - name: Build DEB package
-      run: |
-        dpkg-deb --build package_dir
-
-    - name: Move DEB file to artifacts directory
-      run: |
-        mv package_dir.deb Plan-Imageconverter.deb
-
-    - name: Upload DEB package
-      uses: actions/upload-artifact@v3
-      with:
-        name: Plan-Imageconverter.deb
-        path: Plan-Imageconverter.deb
-        
-  
   publish:
 
-    needs: [build4win, builddeb]
+    needs: [build4win]
     
     runs-on: ubuntu-latest
     
@@ -122,15 +67,3 @@ jobs:
         asset_name: Plan-ImageConverter.exe
         tag: Releases
         body: "Binaries are Below"
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: Plan-Imageconverter.deb
-
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@2.7.0
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: Plan-Imageconverter.deb
-        asset_name: Plan-Imageconverter.deb
-        tag: Releases
