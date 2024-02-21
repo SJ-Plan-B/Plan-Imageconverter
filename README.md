@@ -6,6 +6,7 @@ You must install the following dependencies
 ```
 pip3 install pillow
 pip3 install PySimpleGUI
+pip3 install pillow_avif
 ```
 
 ## Usage

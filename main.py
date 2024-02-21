@@ -148,12 +148,12 @@ if __name__ == "__main__":
                 if sg.popup_yes_no('Are you sure to delete the original pictures?') == 'Yes':
                     values['-deleteoriginal-'] = True
                 else:
-                    values['-deleteoriginal-'] = False
+                    values['-deleteoriginal-']
 
             if values['-deleteoriginal-'] == 'No':
                 values['-deleteoriginal-'] = False
 
-            if 'source_folder' in locals() and 'target_folder' in locals() and values['-targetformat-']:
+            if 'source_folder' in locals() and 'target_folder' in locals() and values['-targetformat-'] and not (values['-deleteoriginal-'] == 'Yes'):
 
                 if main(values['-targetformat-'], source_folder, target_folder, values['-verticalsize-'],
                         values['-horizontalsize-'], values['-deleteoriginal-'], rgba):
